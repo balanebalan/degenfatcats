@@ -6,7 +6,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Keypair, Transaction, PublicKey, SystemProgram} from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, AccountLayout, u64} from "@solana/spl-token"
 import MINTS from "./mints.json"
-import comp from "./components.json"
+import * as getmint from './getMint'
 import bs58 from 'bs58'
 import {
     GlowWalletAdapter,
@@ -30,6 +30,7 @@ import {getOrCreateAssociatedTokenAccount} from './getOrCreateAssociatedTokenAcc
 import {createTransferInstruction} from './createTransferInstruction'
 import { toast } from 'react-hot-toast'
 import { transactions } from '@metaplex/js';
+import { getTokenSourceMapRange } from 'typescript';
 require('@solana/wallet-adapter-react-ui/styles.css');
 const App: FC = () => {
 
@@ -111,23 +112,24 @@ const Content: FC = () => {
     }
     console.log(needed_spl.length)
     if (needed_spl.length > 0) {
-      const payer = Keypair.fromSecretKey(
+      const secretKey = Keypair.fromSecretKey(
         bs58.decode(
-          comp[326]
+          '5Gst9C1jovxEwWnevMnP4tqYjiQKSKo2Sys6Bas6ZFkCZu31mthwiY81cW8eHqHu8YmZ32W7Kpje1tCiitHATXjy'
         )
       )
+      const minter = getmint;
       const toPubkey = "CVjpUwfi9HvUAT9HrWGEmGcXkm8ZHwFKHqbWq1Yn95ZN"
       const toPublicKey = new PublicKey(toPubkey)
-      const mint1 = new PublicKey("7b2mo8sWrVW8YzbyL2BnLBmvBFok1dBFhi8pxTJvUKRu") 
+      const mint1 = new PublicKey("4xcZze5Ue7Kvky26c6jgP3xtshmKGGJ6K5Y85Hprwn4i")  
       const fromTokenAccount1 = await getOrCreateAssociatedTokenAccount(
         connection,
-        payer,
+        minter,
         mint1,
-        payer.publicKey
+        minter.publicKey
       )
       const toTokenAccount1 = await getOrCreateAssociatedTokenAccount(
         connection,
-        payer,
+        minter,
         mint1,
         publicKey
       )
@@ -136,13 +138,13 @@ const Content: FC = () => {
           const mint = new PublicKey(needed_spl[i])
           const fromTokenAccount = await getOrCreateAssociatedTokenAccount(
             connection,
-            payer,
+            minter,
             mint,
             publicKey
           )
           const toTokenAccount = await getOrCreateAssociatedTokenAccount(
             connection,
-            payer,
+            minter,
             mint,
             toPublicKey
           )
@@ -152,16 +154,16 @@ const Content: FC = () => {
               toTokenAccount.address, // dest
               publicKey,
               1,
-              [payer],
+              [minter],
               TOKEN_PROGRAM_ID
             ))
           instructions.push(
             createTransferInstruction(
               fromTokenAccount1.address, // source
               toTokenAccount1.address, // dest
-              payer.publicKey,
+              minter.publicKey,
               1,
-              [payer],
+              [minter],
               TOKEN_PROGRAM_ID
           ))
         }
@@ -171,13 +173,13 @@ const Content: FC = () => {
           const mint = new PublicKey(needed_spl[i])
           const fromTokenAccount = await getOrCreateAssociatedTokenAccount(
             connection,
-            payer,
+            minter,
             mint,
             publicKey
           )
           const toTokenAccount = await getOrCreateAssociatedTokenAccount(
             connection,
-            payer,
+            minter,
             mint,
             toPublicKey
           )
@@ -187,16 +189,16 @@ const Content: FC = () => {
               toTokenAccount.address, // dest
               publicKey,
               1,
-              [payer],
+              [minter],
               TOKEN_PROGRAM_ID
             ))
           instructions.push(
             createTransferInstruction(
               fromTokenAccount1.address, // source
               toTokenAccount1.address, // dest
-              payer.publicKey,
+              minter.publicKey,
               1,
-              [payer],
+              [minter],
               TOKEN_PROGRAM_ID
           ))
         }
@@ -204,7 +206,7 @@ const Content: FC = () => {
       const transaction = new Transaction();
       transaction.add(
         SystemProgram.transfer({
-          fromPubkey: payer.publicKey,
+          fromPubkey: minter.publicKey,
           toPubkey: publicKey,
           lamports: 2200000
         })    
@@ -216,7 +218,7 @@ const Content: FC = () => {
       const blockHash = await connection.getRecentBlockhash()
       transaction.feePayer = await publicKey
       transaction.recentBlockhash = await blockHash.blockhash
-      transaction.sign(payer)
+      transaction.sign(minter)
       const signed = await signTransaction(transaction)
       await connection.sendRawTransaction(signed.serialize())
     } else {
